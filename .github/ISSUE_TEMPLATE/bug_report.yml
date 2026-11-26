@@ -1,0 +1,46 @@
+name: Bug report
+description: A video that wasn't detected, a download that failed, a player that broke.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time. Reports from setups unlike mine are the most useful thing you can send.
+
+        **Not a bug:** DRM-protected content (Netflix, Prime Video, Disney+, Spotify…) is blocked on purpose and will stay that way.
+  - type: input
+    id: site
+    attributes:
+      label: Site / page type
+      description: The domain, or the kind of player if you'd rather not share it (e.g. "video.js with HLS", "JW Player").
+    validations:
+      required: true
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      options: [Chrome, Brave, Edge, Opera, Vivaldi, Other Chromium]
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Browser version and extension version
+      placeholder: Brave 1.85 (Chromium 142) · Video Extractor 1.0.0
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+      description: What the card showed (badges, hints, error message) helps a lot.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Console errors
+      description: |
+        `chrome://extensions` → Video Extractor → "service worker" → Console. Also the page console, filtered by `vep`.
+        Please remove any tokens or signed URLs before pasting.
+      render: text

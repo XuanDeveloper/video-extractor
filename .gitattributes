@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.gif binary
+
+# Third-party minified bundles: keep them out of diffs and language stats.
+extension/src/vendor/** -diff linguist-vendored

@@ -1,0 +1,22 @@
+name: Feature idea
+description: Something the extension could do better.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is a personal project published as-is, so there's no promise an idea gets built —
+        but a clear problem statement makes it much more likely.
+
+        Requests to bypass DRM or a site's access controls will be closed.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: The situation, not the solution.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would help?

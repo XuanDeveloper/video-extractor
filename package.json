@@ -1,0 +1,27 @@
+{
+  "name": "video-extractor",
+  "version": "1.0.0",
+  "description": "Browser extension that finds every video a page actually loads — files, HLS, DASH and MSE streams — and lets you pick what to save.",
+  "author": "Juan Machado",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "fixtures": "node scripts/make-fixtures.mjs",
+    "lint": "eslint .",
+    "test": "node --test \"tests/unit/*.test.mjs\"",
+    "test:e2e": "node scripts/make-fixtures.mjs && node --test --test-concurrency=1 \"tests/e2e/*.e2e.mjs\"",
+    "check": "npm run lint && npm test && node scripts/check-manifest.mjs",
+    "package": "node scripts/check-manifest.mjs && node scripts/package.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "eslint": "^9.39.1",
+    "globals": "^16.5.0",
+    "linkedom": "^0.18.12",
+    "puppeteer": "^24.31.0"
+  }
+}

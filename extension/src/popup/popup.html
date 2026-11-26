@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Video Extractor</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo" aria-hidden="true"></span>
+        <div class="brand-text">
+          <strong>Video Extractor</strong>
+          <span id="pageTitle" class="muted">—</span>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button id="btnRescan" class="icon-btn" title="Procurar de novo">⟳</button>
+        <button id="btnExpandWindow" class="icon-btn" title="Abrir em uma aba">⧉</button>
+        <button id="btnClear" class="icon-btn" title="Limpar lista desta aba">🗑</button>
+      </div>
+    </header>
+
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-tab="media" role="tab">Mídia <span id="countMedia" class="pill">0</span></button>
+      <button class="tab" data-tab="queue" role="tab">Fila <span id="countQueue" class="pill">0</span></button>
+      <button class="tab" data-tab="settings" role="tab">Opções</button>
+    </nav>
+
+    <!-- ------------------------------------------------------- MÍDIA -->
+    <section class="panel active" data-panel="media">
+      <div class="toolbar">
+        <input id="search" type="search" placeholder="Filtrar por nome ou URL…" autocomplete="off" />
+        <div class="chips" id="chips">
+          <button class="chip active" data-filter="all">Todos</button>
+          <button class="chip" data-filter="file">Arquivos</button>
+          <button class="chip" data-filter="hls">HLS</button>
+          <button class="chip" data-filter="dash">DASH</button>
+          <button class="chip" data-filter="audio">Áudio</button>
+          <button class="chip" data-filter="capture">Capturas</button>
+        </div>
+      </div>
+
+      <div id="player" class="player" hidden>
+        <div class="player-head">
+          <strong id="playerTitle" class="player-title">—</strong>
+          <button id="playerClose" class="icon-btn" title="Fechar preview">✕</button>
+        </div>
+        <div class="player-stage">
+          <video id="playerVideo" controls playsinline preload="metadata"></video>
+          <div id="playerStatus" class="player-status">Carregando…</div>
+        </div>
+        <div class="player-foot">
+          <select id="playerQuality" hidden></select>
+          <span id="playerInfo" class="muted"></span>
+          <div class="spacer"></div>
+          <button id="playerDownload" class="mini">⬇ Baixar este</button>
+        </div>
+      </div>
+
+      <div id="list" class="list" aria-live="polite"></div>
+
+      <div id="empty" class="empty">
+        <p><strong>Nenhum vídeo detectado ainda.</strong></p>
+        <p class="muted">
+          Dê play no vídeo da página — a extensão lê as requisições (GET/POST), o DOM e os streams
+          montados em memória. Depois clique em ⟳.
+        </p>
+        <p id="hiddenInfo" class="muted"></p>
+      </div>
+
+      <footer class="actionbar">
+        <label class="check">
+          <input type="checkbox" id="selectAll" /> <span id="selectionInfo">0 selecionados</span>
+        </label>
+        <div class="spacer"></div>
+        <button id="btnDownloadSelected" class="primary" disabled>Baixar selecionados</button>
+      </footer>
+    </section>
+
+    <!-- -------------------------------------------------------- FILA -->
+    <section class="panel" data-panel="queue">
+      <div id="jobs" class="list"></div>
+      <div id="jobsEmpty" class="empty"><p class="muted">Nenhum download ainda.</p></div>
+      <footer class="actionbar">
+        <div class="spacer"></div>
+        <button id="btnClearJobs" class="ghost">Limpar concluídos</button>
+      </footer>
+    </section>
+
+    <!-- ----------------------------------------------------- OPÇÕES -->
+    <section class="panel" data-panel="settings">
+      <div class="settings">
+        <label class="row">
+          <span>Downloads simultâneos de segmentos</span>
+          <input type="number" id="setConcurrency" min="1" max="24" />
+        </label>
+        <label class="row">
+          <span>Tentativas por segmento</span>
+          <input type="number" id="setRetries" min="1" max="10" />
+        </label>
+        <label class="row">
+          <span>Pasta de destino (dentro de Downloads)</span>
+          <input type="text" id="setSubfolder" placeholder="VideoExtractor" />
+        </label>
+        <label class="row">
+          <span>Limite de captura em memória (MB)</span>
+          <input type="number" id="setMaxCapture" min="64" max="8192" step="64" />
+        </label>
+        <label class="row switch">
+          <span>Mostrar tudo (inclui fragmentos, anúncios e itens pequenos)</span>
+          <input type="checkbox" id="setShowSegments" />
+        </label>
+        <label class="row switch">
+          <span>Mostrar contador no ícone</span>
+          <input type="checkbox" id="setBadge" />
+        </label>
+        <label class="row switch">
+          <span>Perguntar onde salvar</span>
+          <input type="checkbox" id="setSaveAs" />
+        </label>
+
+        <div class="note">
+          <strong>Limites honestos</strong>
+          <ul>
+            <li>HLS em MPEG-TS sai como <code>.ts</code>; converta sem recodificar com
+              <code>ffmpeg -i in.ts -c copy out.mp4</code>.</li>
+            <li>DASH entrega vídeo e áudio em faixas separadas — baixe as duas e junte com
+              <code>ffmpeg -i v.mp4 -i a.m4a -c copy out.mp4</code>.</li>
+            <li>Conteúdo com DRM (Widevine, PlayReady, FairPlay) é detectado e bloqueado.</li>
+            <li>Transmissões ao vivo baixam apenas o trecho presente na playlist no momento.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="../vendor/hls.min.js"></script>
+    <script src="../vendor/dash.all.min.js"></script>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>
